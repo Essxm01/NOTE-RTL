@@ -2,7 +2,9 @@
 <html lang="ar" dir="rtl" data-theme="light">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#09090b" media="(prefers-color-scheme: dark)">
 <title>نوّتي — مساحة الكتابة</title>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -11,28 +13,54 @@
 
 <style>
   :root{
-    --bg:#f7f7f8;
+    --bg:#fafafa;
+    --bg-soft:#f4f4f5;
     --paper:#ffffff;
-    --fg:#121214;
-    --muted:#8b8f97;
-    --border:#ececee;
-    --soft:#f2f2f4;
-    --code:#f5f5f7;
-    --radius:20px;
-    --danger:#e5484d;
+    --fg:#0a0a0b;
+    --fg-soft:#18181b;
+    --muted:#71717a;
+    --muted-soft:#a1a1aa;
+    --border:#e4e4e7;
+    --border-strong:#d4d4d8;
+    --soft:#f4f4f5;
+    --code:#f4f4f5;
+    --radius-sm:10px;
+    --radius:14px;
+    --radius-lg:20px;
+    --radius-xl:28px;
+    --danger:#e11d48;
+    --success:#059669;
+    --visual-bg-1:#18181b;
+    --visual-bg-2:#09090b;
+    --shadow-sm:0 1px 2px rgba(0,0,0,.04);
+    --shadow:0 4px 16px -8px rgba(0,0,0,.08), 0 2px 4px -2px rgba(0,0,0,.04);
+    --shadow-lg:0 24px 48px -24px rgba(0,0,0,.12), 0 8px 16px -8px rgba(0,0,0,.06);
+    --shadow-xl:0 32px 64px -32px rgba(0,0,0,.16), 0 12px 24px -12px rgba(0,0,0,.08);
   }
   [data-theme="dark"]{
-    --bg:#08080a;
-    --paper:#101012;
-    --fg:#f0f0f2;
-    --muted:#85888f;
-    --border:#1e1f22;
+    --bg:#09090b;
+    --bg-soft:#0f0f11;
+    --paper:#131316;
+    --fg:#fafafa;
+    --fg-soft:#f4f4f5;
+    --muted:#a1a1aa;
+    --muted-soft:#71717a;
+    --border:#27272a;
+    --border-strong:#3f3f46;
     --soft:#18181b;
-    --code:#17171a;
-    --danger:#ff6369;
+    --code:#18181b;
+    --danger:#fb7185;
+    --success:#34d399;
+    --visual-bg-1:#1c1c20;
+    --visual-bg-2:#0a0a0c;
+    --shadow-sm:0 1px 2px rgba(0,0,0,.4);
+    --shadow:0 4px 16px -8px rgba(0,0,0,.4), 0 2px 4px -2px rgba(0,0,0,.3);
+    --shadow-lg:0 24px 48px -24px rgba(0,0,0,.6), 0 8px 16px -8px rgba(0,0,0,.4);
+    --shadow-xl:0 32px 64px -32px rgba(0,0,0,.7), 0 12px 24px -12px rgba(0,0,0,.5);
   }
 
   *{ box-sizing:border-box; }
+  html{ -webkit-text-size-adjust:100%; }
   html,body{ min-height:100%; }
   body{
     margin:0;
@@ -42,19 +70,55 @@
     display:flex;
     flex-direction:column;
     min-height:100vh;
-    transition:background .25s ease, color .25s ease;
+    min-height:100dvh;
+    transition:background .3s ease, color .3s ease;
     -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+    background-image:
+      radial-gradient(circle at 15% 10%, color-mix(in srgb, var(--fg) 3%, transparent) 0%, transparent 40%),
+      radial-gradient(circle at 85% 90%, color-mix(in srgb, var(--fg) 3%, transparent) 0%, transparent 40%);
+    background-attachment:fixed;
+    overscroll-behavior-y:none;
   }
 
-  ::-webkit-scrollbar{ width:11px; height:11px; }
+  ::-webkit-scrollbar{ width:12px; height:12px; }
   ::-webkit-scrollbar-track{ background:transparent; }
   ::-webkit-scrollbar-thumb{
-    background:var(--border);
+    background:var(--border-strong);
     border-radius:99px;
     border:3px solid var(--bg);
   }
+  ::-webkit-scrollbar-thumb:hover{ background:var(--muted); }
 
-  /* ========== شاشة تسجيل الدخول ========== */
+  /* ================= شاشة التحميل ================= */
+  #loading-screen{
+    position:fixed;
+    inset:0;
+    z-index:400;
+    background:var(--bg);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-direction:column;
+    gap:22px;
+  }
+  #loading-screen.hidden{ display:none; }
+  .spinner{
+    width:44px; height:44px;
+    border:3px solid var(--border);
+    border-top-color:var(--fg);
+    border-radius:50%;
+    animation:spin .8s linear infinite;
+  }
+  @keyframes spin{ to { transform:rotate(360deg); } }
+  .loading-text{
+    font-size:14px;
+    font-weight:600;
+    color:var(--muted);
+    letter-spacing:.3px;
+  }
+
+  /* ================= شاشة الدخول ================= */
   #auth-screen{
     position:fixed;
     inset:0;
@@ -63,127 +127,276 @@
     align-items:center;
     justify-content:center;
     background:var(--bg);
-    padding:20px;
+    padding:24px;
+    padding-top:calc(24px + env(safe-area-inset-top));
+    padding-bottom:calc(24px + env(safe-area-inset-bottom));
     overflow-y:auto;
+    -webkit-overflow-scrolling:touch;
   }
   #auth-screen.hidden{ display:none; }
 
   .auth-card{
     width:100%;
-    max-width:420px;
+    max-width:1080px;
     background:var(--paper);
     border:1px solid var(--border);
-    border-radius:var(--radius);
-    padding:40px 34px;
-    box-shadow:0 20px 60px -30px rgba(0,0,0,.15);
+    border-radius:var(--radius-xl);
+    box-shadow:var(--shadow-xl);
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    overflow:hidden;
+    min-height:600px;
     margin:auto;
   }
-  [data-theme="dark"] .auth-card{
-    box-shadow:0 20px 60px -30px rgba(0,0,0,.7);
+
+  /* ==== جهة الرسم — داكنة دائمًا ==== */
+  .auth-visual{
+    position:relative;
+    background:linear-gradient(155deg, var(--visual-bg-1) 0%, var(--visual-bg-2) 100%);
+    color:#fafafa;
+    padding:52px 44px;
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+    overflow:hidden;
+    isolation:isolate;
+  }
+  .auth-visual::before{
+    content:'';
+    position:absolute;
+    inset:0;
+    background-image:
+      radial-gradient(circle at 25% 20%, rgba(255,255,255,.08) 0%, transparent 55%),
+      radial-gradient(circle at 80% 85%, rgba(255,255,255,.05) 0%, transparent 50%);
+    pointer-events:none;
+    z-index:0;
+  }
+  .auth-visual::after{
+    content:'';
+    position:absolute;
+    inset:0;
+    background-image:
+      linear-gradient(rgba(255,255,255,.045) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,.045) 1px, transparent 1px);
+    background-size:44px 44px;
+    mask-image:radial-gradient(circle at 50% 50%, black 30%, transparent 78%);
+    -webkit-mask-image:radial-gradient(circle at 50% 50%, black 30%, transparent 78%);
+    pointer-events:none;
+    z-index:0;
+    opacity:.85;
   }
 
-  .auth-logo{
-    width:52px; height:52px;
+  .auth-visual-inner{
+    position:relative;
+    z-index:1;
+    display:flex;
+    flex-direction:column;
+    gap:32px;
+    height:100%;
+  }
+
+  .auth-brand{
+    display:flex;
+    align-items:center;
+    gap:14px;
+  }
+  .auth-brand .mark{
+    width:46px; height:46px;
     display:grid; place-items:center;
-    background:var(--fg); color:var(--paper);
-    border-radius:15px;
-    font-weight:800; font-size:24px;
-    margin:0 auto 22px;
+    background:#ffffff; color:#0a0a0b;
+    border-radius:14px;
+    font-weight:800; font-size:22px;
+    letter-spacing:-1px;
+    box-shadow:0 10px 28px -10px rgba(0,0,0,.6);
+  }
+  .auth-brand .name{
+    font-size:20px;
+    font-weight:800;
+    letter-spacing:-.3px;
+    color:#fafafa;
+  }
+  .auth-brand .tag{
+    font-size:12px;
+    color:rgba(255,255,255,.55);
+    font-weight:500;
+    display:block;
+    margin-top:2px;
   }
 
+  .auth-illustration{
+    flex:1;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:12px 0;
+    min-height:180px;
+  }
+  .auth-illustration svg{
+    width:100%;
+    max-width:300px;
+    height:auto;
+    color:rgba(255,255,255,.88);
+    filter:drop-shadow(0 20px 40px rgba(0,0,0,.4));
+  }
+
+  .auth-features{
+    display:flex;
+    flex-direction:column;
+    gap:13px;
+    position:relative;
+    z-index:1;
+  }
+  .auth-feature{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    font-size:13.5px;
+    font-weight:500;
+    color:rgba(255,255,255,.82);
+    line-height:1.6;
+  }
+  .auth-feature .check{
+    width:22px; height:22px;
+    flex:0 0 22px;
+    border-radius:50%;
+    background:rgba(255,255,255,.14);
+    display:grid; place-items:center;
+    border:1px solid rgba(255,255,255,.2);
+  }
+  .auth-feature .check svg{
+    width:11px; height:11px;
+    color:#fafafa;
+  }
+
+  /* ==== جهة النموذج ==== */
+  .auth-form-side{
+    padding:56px 56px;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    background:var(--paper);
+    transition:background .3s ease;
+  }
+
+  .auth-form-side .welcome{
+    font-size:12.5px;
+    font-weight:700;
+    color:var(--muted);
+    text-transform:uppercase;
+    letter-spacing:1.2px;
+    margin-bottom:10px;
+  }
   .auth-title{
-    font-size:22px;
+    font-size:30px;
     font-weight:800;
-    text-align:center;
-    margin:0 0 6px;
+    margin:0 0 10px;
+    letter-spacing:-.6px;
+    line-height:1.25;
   }
   .auth-sub{
-    font-size:13.5px;
+    font-size:14.5px;
     color:var(--muted);
-    text-align:center;
-    margin:0 0 28px;
+    margin:0 0 32px;
     font-weight:500;
+    line-height:1.7;
   }
 
   .tabs{
     display:flex;
-    gap:4px;
-    padding:4px;
+    gap:5px;
+    padding:5px;
     background:var(--soft);
-    border-radius:12px;
-    margin-bottom:22px;
+    border-radius:14px;
+    margin-bottom:26px;
   }
   .tabs button{
     flex:1;
     font-family:inherit;
-    font-size:13.5px;
+    font-size:14px;
     font-weight:700;
-    padding:9px;
+    padding:11px 16px;
     border:none;
-    border-radius:9px;
+    border-radius:10px;
     background:transparent;
     color:var(--muted);
     cursor:pointer;
-    transition:color .2s, background .2s;
+    transition:color .2s, background .2s, box-shadow .2s;
+    white-space:nowrap;
+    min-height:44px;
   }
+  .tabs button:hover{ color:var(--fg); }
   .tabs button.active{
     background:var(--paper);
     color:var(--fg);
-    box-shadow:0 1px 3px rgba(0,0,0,.06);
+    box-shadow:var(--shadow-sm);
   }
 
   .field{
-    margin-bottom:15px;
+    margin-bottom:18px;
   }
   .field label{
     display:block;
-    font-size:12.5px;
+    font-size:13px;
     font-weight:700;
-    color:var(--muted);
-    margin-bottom:6px;
+    color:var(--fg-soft);
+    margin-bottom:8px;
   }
   .field input{
     width:100%;
     font-family:inherit;
-    font-size:15px;
-    padding:12px 15px;
-    border:1px solid var(--border);
-    border-radius:12px;
-    background:var(--bg);
+    font-size:16px;
+    font-weight:500;
+    padding:15px 18px;
+    border:1.5px solid var(--border);
+    border-radius:14px;
+    background:var(--bg-soft);
     color:var(--fg);
     outline:none;
-    transition:border-color .2s;
+    transition:border-color .2s, background .2s, box-shadow .2s;
     direction:ltr;
     text-align:left;
+    height:54px;
+    -webkit-appearance:none;
+    appearance:none;
   }
-  .field input:focus{ border-color:var(--fg); }
+  .field input::placeholder{ color:var(--muted-soft); }
+  .field input:focus{
+    border-color:var(--fg);
+    background:var(--paper);
+    box-shadow:0 0 0 4px color-mix(in srgb, var(--fg) 8%, transparent);
+  }
 
   .auth-submit{
     width:100%;
     font-family:inherit;
     font-size:15px;
     font-weight:700;
-    padding:13px;
+    padding:15px;
     border:none;
-    border-radius:12px;
+    border-radius:14px;
     background:var(--fg);
     color:var(--paper);
     cursor:pointer;
-    transition:opacity .2s, transform .12s;
-    margin-top:6px;
+    transition:opacity .2s, transform .12s, box-shadow .2s;
+    margin-top:8px;
+    height:54px;
+    box-shadow:0 8px 20px -8px color-mix(in srgb, var(--fg) 40%, transparent);
+    -webkit-tap-highlight-color:transparent;
   }
-  .auth-submit:hover{ opacity:.9; }
-  .auth-submit:active{ transform:scale(.98); }
-  .auth-submit:disabled{ opacity:.5; cursor:not-allowed; }
+  .auth-submit:hover{ opacity:.92; box-shadow:0 12px 28px -8px color-mix(in srgb, var(--fg) 50%, transparent); }
+  .auth-submit:active{ transform:scale(.985); }
+  .auth-submit:disabled{ opacity:.5; cursor:not-allowed; box-shadow:none; }
 
   .divider{
     display:flex;
     align-items:center;
-    gap:12px;
-    margin:22px 0;
-    color:var(--muted);
-    font-size:12.5px;
-    font-weight:600;
+    gap:14px;
+    margin:24px 0;
+    color:var(--muted-soft);
+    font-size:11.5px;
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:1px;
   }
   .divider::before,.divider::after{
     content:'';
@@ -197,43 +410,57 @@
     display:flex;
     align-items:center;
     justify-content:center;
-    gap:11px;
+    gap:12px;
     font-family:inherit;
-    font-size:14.5px;
+    font-size:15px;
     font-weight:700;
-    padding:12px;
-    border:1px solid var(--border);
-    border-radius:12px;
+    padding:15px;
+    border:1.5px solid var(--border);
+    border-radius:14px;
     background:var(--paper);
     color:var(--fg);
     cursor:pointer;
-    transition:background .2s, border-color .2s;
+    transition:background .2s, border-color .2s, transform .12s;
+    height:54px;
+    -webkit-tap-highlight-color:transparent;
   }
-  .btn-google:hover{ background:var(--soft); }
+  .btn-google:hover{ background:var(--bg-soft); border-color:var(--border-strong); }
+  .btn-google:active{ transform:scale(.985); }
   .btn-google:disabled{ opacity:.5; cursor:not-allowed; }
-  .btn-google svg{ width:19px; height:19px; flex:0 0 19px; }
+  .btn-google svg{ width:20px; height:20px; flex:0 0 20px; }
 
   .auth-msg{
-    font-size:13px;
+    font-size:13.5px;
     font-weight:600;
     text-align:center;
-    padding:11px 14px;
-    border-radius:11px;
-    margin-bottom:16px;
+    padding:13px 16px;
+    border-radius:12px;
+    margin-bottom:20px;
     display:none;
+    line-height:1.6;
   }
   .auth-msg.error{
     display:block;
-    background:color-mix(in srgb, var(--danger) 12%, transparent);
+    background:color-mix(in srgb, var(--danger) 10%, transparent);
     color:var(--danger);
+    border:1px solid color-mix(in srgb, var(--danger) 20%, transparent);
   }
   .auth-msg.success{
     display:block;
-    background:color-mix(in srgb, #30a46c 12%, transparent);
-    color:#30a46c;
+    background:color-mix(in srgb, var(--success) 10%, transparent);
+    color:var(--success);
+    border:1px solid color-mix(in srgb, var(--success) 20%, transparent);
   }
 
-  /* ========== الهيدر ========== */
+  .auth-footer-note{
+    text-align:center;
+    font-size:11.5px;
+    color:var(--muted-soft);
+    margin-top:22px;
+    line-height:1.7;
+  }
+
+  /* ================= الهيدر ================= */
   header{
     position:sticky;
     top:0;
@@ -241,140 +468,165 @@
     display:grid;
     grid-template-columns:1fr auto 1fr;
     align-items:center;
-    gap:14px;
-    padding:13px 32px;
-    background:color-mix(in srgb, var(--bg) 88%, transparent);
-    backdrop-filter:blur(14px);
-    -webkit-backdrop-filter:blur(14px);
+    gap:16px;
+    padding:14px 32px;
+    padding-top:calc(14px + env(safe-area-inset-top));
+    background:color-mix(in srgb, var(--bg) 82%, transparent);
+    backdrop-filter:blur(18px) saturate(180%);
+    -webkit-backdrop-filter:blur(18px) saturate(180%);
     border-bottom:1px solid var(--border);
-    transition:background .25s, border-color .25s;
+    transition:background .3s, border-color .3s;
   }
 
-  .brand{ display:flex; align-items:center; gap:11px; min-width:0; }
+  .brand{ display:flex; align-items:center; gap:13px; min-width:0; }
   .logo{
-    width:38px; height:38px; flex:0 0 38px;
+    width:42px; height:42px; flex:0 0 42px;
     display:grid; place-items:center;
     background:var(--fg); color:var(--paper);
-    border-radius:12px;
-    font-weight:800; font-size:18px;
+    border-radius:13px;
+    font-weight:800; font-size:19px;
+    letter-spacing:-1px;
+    box-shadow:var(--shadow-sm);
+    transition:background .3s, color .3s;
   }
-  .brand-text{ display:flex; flex-direction:column; line-height:1.35; min-width:0; }
-  .brand-text .title{ font-weight:800; font-size:16.5px; }
-  .brand-text .sub{ font-size:11.5px; color:var(--muted); font-weight:500; white-space:nowrap; }
+  .brand-text{ display:flex; flex-direction:column; line-height:1.3; min-width:0; }
+  .brand-text .title{ font-weight:800; font-size:17px; letter-spacing:-.3px; }
+  .brand-text .sub{ font-size:11.5px; color:var(--muted); font-weight:500; white-space:nowrap; margin-top:1px; }
 
   .segmented{
     display:flex;
-    gap:3px;
-    padding:3px;
+    gap:4px;
+    padding:4px;
     background:var(--soft);
     border-radius:99px;
     border:1px solid var(--border);
   }
   .segmented button{
     font-family:inherit;
-    font-size:13px;
+    font-size:13.5px;
     font-weight:700;
-    padding:7px 22px;
+    padding:9px 24px;
     border:none;
     border-radius:99px;
     background:transparent;
     color:var(--muted);
     cursor:pointer;
-    transition:color .2s, background .2s;
+    transition:color .2s, background .2s, box-shadow .2s;
     white-space:nowrap;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    min-height:40px;
+    -webkit-tap-highlight-color:transparent;
   }
+  .segmented button svg{ width:15px; height:15px; }
   .segmented button:hover{ color:var(--fg); }
   .segmented button.active{
     background:var(--paper);
     color:var(--fg);
-    box-shadow:0 1px 3px rgba(0,0,0,.07);
+    box-shadow:var(--shadow-sm);
   }
 
-  .actions{ display:flex; align-items:center; gap:7px; justify-content:flex-end; }
+  .actions{ display:flex; align-items:center; gap:8px; justify-content:flex-end; }
 
   .btn{
     font-family:inherit;
-    font-size:13px;
+    font-size:13.5px;
     font-weight:600;
-    padding:9px 15px;
-    border-radius:11px;
+    padding:10px 16px;
+    border-radius:12px;
     border:1px solid var(--border);
     background:transparent;
     color:var(--fg);
     cursor:pointer;
-    transition:background .18s, color .18s, border-color .18s, transform .12s;
+    transition:background .18s, color .18s, border-color .18s, transform .12s, box-shadow .18s;
     white-space:nowrap;
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    -webkit-tap-highlight-color:transparent;
   }
-  .btn:hover{ background:var(--fg); color:var(--paper); border-color:var(--fg); }
-  .btn:active{ transform:scale(.96); }
+  .btn:hover{
+    background:var(--fg);
+    color:var(--paper);
+    border-color:var(--fg);
+    box-shadow:0 6px 16px -6px color-mix(in srgb, var(--fg) 40%, transparent);
+  }
+  .btn:active{ transform:scale(.95); }
+
   .btn.icon{
-    width:38px; height:38px;
+    width:42px; height:42px;
     padding:0;
     display:grid; place-items:center;
-    border-radius:11px;
+    border-radius:12px;
   }
-  .btn.icon svg{ width:16.5px; height:16.5px; }
+  .btn.icon svg{ width:17px; height:17px; }
 
   [data-theme="light"] .icon-sun{ display:none; }
   [data-theme="dark"] .icon-moon{ display:none; }
 
-  /* ========== معلومات المستخدم ========== */
+  /* ================= معلومات المستخدم ================= */
   .user-chip{
     display:flex;
     align-items:center;
-    gap:8px;
-    padding:5px 12px 5px 5px;
+    gap:9px;
+    padding:5px 14px 5px 5px;
     border:1px solid var(--border);
     border-radius:99px;
     cursor:default;
-    max-width:220px;
+    max-width:240px;
+    background:var(--paper);
+    transition:border-color .2s, background .2s;
   }
+  .user-chip:hover{ border-color:var(--border-strong); }
   .user-avatar{
-    width:28px; height:28px;
+    width:32px; height:32px;
     border-radius:50%;
-    background:var(--soft);
+    background:var(--fg);
     display:grid; place-items:center;
     font-weight:800;
-    font-size:12px;
-    color:var(--fg);
+    font-size:12.5px;
+    color:var(--paper);
     overflow:hidden;
-    flex:0 0 28px;
+    flex:0 0 32px;
   }
   .user-avatar img{ width:100%; height:100%; object-fit:cover; }
   .user-name{
-    font-size:12.5px;
+    font-size:13px;
     font-weight:700;
     white-space:nowrap;
     overflow:hidden;
     text-overflow:ellipsis;
+    color:var(--fg);
   }
 
-  /* ========== الورقة ========== */
+  /* ================= الورقة ================= */
   main{
     flex:1;
     width:100%;
     display:flex;
     justify-content:center;
-    padding:30px 3% 20px;
+    padding:36px 3% 24px;
   }
   .paper{
     width:100%;
+    max-width:1400px;
     background:var(--paper);
     border:1px solid var(--border);
-    border-radius:var(--radius);
-    padding:60px clamp(28px, 6vw, 110px) 90px;
-    min-height:calc(100vh - 180px);
-    box-shadow:0 1px 2px rgba(0,0,0,.02), 0 12px 40px -18px rgba(0,0,0,.07);
-    transition:background .25s, border-color .25s;
-  }
-  [data-theme="dark"] .paper{
-    box-shadow:0 1px 2px rgba(0,0,0,.3), 0 12px 40px -18px rgba(0,0,0,.6);
+    border-radius:var(--radius-xl);
+    padding:72px clamp(32px, 6vw, 120px) 100px;
+    min-height:calc(100vh - 220px);
+    min-height:calc(100dvh - 220px);
+    box-shadow:var(--shadow-lg);
+    transition:background .3s, border-color .3s, box-shadow .3s;
   }
 
   #editor{
     display:block;
     width:100%;
-    min-height:calc(100vh - 320px);
+    min-height:calc(100vh - 360px);
+    min-height:calc(100dvh - 360px);
     border:none;
     outline:none;
     resize:none;
@@ -382,19 +634,25 @@
     background:transparent;
     color:var(--fg);
     font-family:'Cairo', sans-serif;
-    font-size:18px;
+    font-size:18.5px;
+    font-weight:400;
     line-height:2.15;
+    letter-spacing:.05px;
     padding:0;
     direction:rtl;
     text-align:right;
     caret-color:var(--fg);
+    transition:color .3s;
+    -webkit-appearance:none;
   }
-  #editor::placeholder{ color:var(--muted); opacity:.85; }
+  #editor::placeholder{ color:var(--muted-soft); opacity:1; font-weight:400; }
 
   #preview{
     display:none;
-    font-size:18px;
+    font-size:18.5px;
     line-height:2.15;
+    font-weight:400;
+    letter-spacing:.05px;
     word-wrap:break-word;
     overflow-wrap:break-word;
   }
@@ -404,24 +662,26 @@
     font-weight:800;
     line-height:1.55;
     margin:1.5em 0 .65em;
+    letter-spacing:-.4px;
   }
   #preview h1{ font-size:1.9em; }
   #preview h2{ font-size:1.52em; }
   #preview h3{ font-size:1.28em; }
   #preview h4{ font-size:1.12em; }
   #preview h5,#preview h6{ font-size:1em; color:var(--muted); }
-  #preview h1,#preview h2{ padding-bottom:.35em; border-bottom:1px solid var(--border); }
+  #preview h1,#preview h2{ padding-bottom:.4em; border-bottom:1px solid var(--border); }
   #preview p{ margin:0 0 1.15em; }
   #preview strong{ font-weight:800; }
   #preview em{ font-style:italic; }
   #preview del{ opacity:.5; }
-  #preview a{ color:inherit; text-decoration:underline; text-underline-offset:4px; }
+  #preview a{ color:inherit; text-decoration:underline; text-underline-offset:4px; text-decoration-color:var(--muted-soft); transition:text-decoration-color .2s; }
+  #preview a:hover{ text-decoration-color:currentColor; }
   #preview ul,#preview ol{ margin:0 0 1.15em; padding-inline-start:1.6em; }
   #preview li{ margin-bottom:.5em; }
   #preview li::marker{ color:var(--muted); font-weight:700; }
   #preview blockquote{
     margin:0 0 1.15em;
-    padding:.5em 1.2em;
+    padding:.7em 1.3em;
     border-inline-start:3px solid var(--fg);
     color:var(--muted);
     background:var(--code);
@@ -430,11 +690,11 @@
   #preview blockquote p:last-child{ margin-bottom:0; }
   #preview hr{ border:none; border-top:1px solid var(--border); margin:2em 0; }
   #preview code{
-    font-family:ui-monospace,monospace;
+    font-family:ui-monospace,'SF Mono',monospace;
     font-size:.85em;
     background:var(--code);
-    padding:2px 7px;
-    border-radius:7px;
+    padding:3px 8px;
+    border-radius:8px;
     direction:ltr;
     unicode-bidi:embed;
   }
@@ -444,10 +704,11 @@
     background:var(--code);
     border:1px solid var(--border);
     border-radius:14px;
-    padding:16px 18px;
+    padding:18px 20px;
     overflow-x:auto;
     margin:0 0 1.25em;
     line-height:1.85;
+    -webkit-overflow-scrolling:touch;
   }
   #preview pre code{ background:none; padding:0; font-size:13.5px; }
   #preview table{
@@ -461,93 +722,266 @@
   }
   #preview th,#preview td{
     border:1px solid var(--border);
-    padding:10px 14px;
+    padding:12px 16px;
     text-align:right;
   }
   #preview th{ background:var(--code); font-weight:700; }
   #preview img{ max-width:100%; border-radius:14px; display:block; }
 
+  /* ================= Empty State ================= */
   .empty{
-    color:var(--muted);
-    font-size:15px;
-    line-height:2;
-    border:1px dashed var(--border);
-    border-radius:16px;
-    padding:26px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
     text-align:center;
+    padding:56px 28px;
+    color:var(--muted);
+    gap:18px;
+    border:1.5px dashed var(--border-strong);
+    border-radius:var(--radius-lg);
+    background:var(--bg-soft);
+  }
+  .empty svg{
+    width:80px;
+    height:80px;
+    color:var(--muted-soft);
+    opacity:.9;
+  }
+  .empty-title{
+    font-size:15.5px;
+    font-weight:700;
+    color:var(--fg-soft);
+    margin:0;
+  }
+  .empty-text{
+    font-size:13.5px;
+    line-height:1.8;
+    max-width:340px;
+    margin:0;
+    font-weight:500;
   }
 
   footer{
     text-align:center;
-    padding:0 22px 26px;
-    font-size:12px;
+    padding:0 24px 32px;
+    padding-bottom:calc(32px + env(safe-area-inset-bottom));
+    font-size:12.5px;
     font-weight:600;
     color:var(--muted);
     font-variant-numeric:tabular-nums;
+    letter-spacing:.2px;
   }
 
+  /* ================= Toast ================= */
   .toast{
     position:fixed;
-    bottom:26px;
+    bottom:32px;
+    bottom:calc(32px + env(safe-area-inset-bottom));
     right:50%;
-    transform:translate(50%,26px);
+    transform:translate(50%,32px);
     background:var(--fg);
     color:var(--paper);
-    padding:11px 24px;
+    padding:13px 26px;
     border-radius:99px;
     font-size:13.5px;
     font-weight:700;
     opacity:0;
     pointer-events:none;
-    transition:opacity .25s, transform .25s;
+    transition:opacity .3s, transform .3s;
     z-index:300;
-    box-shadow:0 10px 30px -8px rgba(0,0,0,.3);
+    box-shadow:var(--shadow-xl);
+    display:flex;
+    align-items:center;
+    gap:8px;
   }
   .toast.show{ opacity:1; transform:translate(50%,0); }
 
-  /* ========== شاشة التحميل ========== */
-  #loading-screen{
-    position:fixed;
-    inset:0;
-    z-index:400;
-    background:var(--bg);
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    flex-direction:column;
-    gap:18px;
-  }
-  #loading-screen.hidden{ display:none; }
-  .spinner{
-    width:40px; height:40px;
-    border:3px solid var(--border);
-    border-top-color:var(--fg);
-    border-radius:50%;
-    animation:spin .8s linear infinite;
-  }
-  @keyframes spin{ to { transform:rotate(360deg); } }
-  .loading-text{
-    font-size:13.5px;
-    font-weight:700;
-    color:var(--muted);
-  }
+  /* ================= Responsive: Tablet ================= */
+  @media (max-width: 960px){
+    .auth-card{
+      grid-template-columns:1fr;
+      max-width:560px;
+      min-height:auto;
+    }
+    .auth-visual{
+      padding:36px 32px 28px;
+      min-height:200px;
+    }
+    .auth-illustration{ display:none; }
+    .auth-features{ display:none; }
+    .auth-form-side{
+      padding:40px 36px;
+    }
+    .auth-title{ font-size:26px; }
 
-  @media (max-width:860px){
     header{
       grid-template-columns:1fr auto;
       grid-template-areas:"brand actions" "seg seg";
-      row-gap:10px;
-      padding:12px 16px;
+      row-gap:12px;
+      padding:12px 20px;
+      padding-top:calc(12px + env(safe-area-inset-top));
     }
     .brand{ grid-area:brand; }
     .actions{ grid-area:actions; }
     .segmented{ grid-area:seg; justify-self:center; }
     .brand-text .sub{ display:none; }
-    main{ padding:18px 12px 14px; }
-    .paper{ padding:32px 22px 48px; border-radius:16px; }
-    #editor{ font-size:17px; }
-    #preview{ font-size:17px; }
+
+    main{ padding:24px 16px 18px; }
+    .paper{ padding:48px 32px 64px; border-radius:22px; }
+  }
+
+  /* ================= Responsive: Phone ================= */
+  @media (max-width: 640px){
+    /* شاشة الدخول — تجربة تطبيق كاملة */
+    #auth-screen{
+      padding:0;
+      align-items:stretch;
+    }
+    .auth-card{
+      border-radius:0;
+      border:none;
+      box-shadow:none;
+      min-height:100vh;
+      min-height:100dvh;
+      max-width:100%;
+      background:var(--paper);
+    }
+    .auth-visual{
+      padding:28px 22px 22px;
+      padding-top:calc(28px + env(safe-area-inset-top));
+      border-radius:0;
+      min-height:auto;
+    }
+    .auth-visual-inner{ gap:14px; }
+    .auth-brand .mark{ width:42px; height:42px; font-size:20px; border-radius:12px; }
+    .auth-brand .name{ font-size:17px; }
+    .auth-brand .tag{ font-size:11px; }
+
+    .auth-form-side{
+      padding:28px 22px 36px;
+      padding-bottom:calc(36px + env(safe-area-inset-bottom));
+      flex:1;
+      justify-content:flex-start;
+    }
+    .auth-form-side .welcome{ font-size:11.5px; margin-bottom:8px; }
+    .auth-title{ font-size:24px; margin-bottom:8px; }
+    .auth-sub{ font-size:13.5px; margin-bottom:24px; line-height:1.65; }
+
+    .tabs{ padding:4px; margin-bottom:22px; border-radius:12px; }
+    .tabs button{ font-size:13.5px; padding:10px; min-height:42px; }
+
+    .field{ margin-bottom:16px; }
+    .field label{ font-size:12.5px; margin-bottom:7px; }
+    .field input{
+      height:52px;
+      font-size:16px;
+      padding:14px 16px;
+      border-radius:13px;
+    }
+    .auth-submit{
+      height:52px;
+      font-size:15px;
+      padding:14px;
+      border-radius:13px;
+    }
+    .divider{ margin:20px 0; font-size:11px; }
+    .btn-google{
+      height:52px;
+      font-size:14.5px;
+      padding:14px;
+      border-radius:13px;
+    }
+    .auth-msg{ font-size:13px; padding:12px 14px; }
+    .auth-footer-note{ font-size:11px; margin-top:18px; }
+
+    /* الهيدر الرئيسي */
+    header{
+      padding:10px 14px;
+      padding-top:calc(10px + env(safe-area-inset-top));
+      gap:8px;
+    }
+    .logo{ width:36px; height:36px; flex:0 0 36px; font-size:16px; border-radius:11px; }
+    .brand-text .title{ font-size:15.5px; }
+    .segmented button{
+      padding:8px 18px;
+      font-size:12.5px;
+      min-height:38px;
+      gap:6px;
+    }
+    .segmented button svg{ width:13px; height:13px; }
+    .btn.icon{
+      width:38px; height:38px;
+      border-radius:11px;
+    }
+    .btn.icon svg{ width:16px; height:16px; }
+    .user-chip{ padding:3px; gap:0; }
+    .user-avatar{ width:32px; height:32px; flex:0 0 32px; }
     .user-name{ display:none; }
+
+    /* المحرر */
+    main{ padding:16px 12px 12px; }
+    .paper{
+      padding:28px 20px 52px;
+      border-radius:20px;
+      min-height:calc(100vh - 200px);
+      min-height:calc(100dvh - 200px);
+    }
+    #editor{
+      font-size:17px;
+      line-height:2;
+      min-height:calc(100vh - 340px);
+      min-height:calc(100dvh - 340px);
+    }
+    #preview{ font-size:16.5px; line-height:2; }
+    #preview h1{ font-size:1.6em; }
+    #preview h2{ font-size:1.35em; }
+    #preview h3{ font-size:1.18em; }
+    #preview pre{ padding:14px 16px; border-radius:12px; }
+    #preview pre code{ font-size:12.5px; }
+    #preview th,#preview td{ padding:10px 12px; }
+
+    .empty{ padding:44px 22px; gap:14px; }
+    .empty svg{ width:64px; height:64px; }
+    .empty-title{ font-size:14.5px; }
+    .empty-text{ font-size:12.5px; }
+
+    footer{
+      padding:0 16px 24px;
+      padding-bottom:calc(24px + env(safe-area-inset-bottom));
+      font-size:11.5px;
+    }
+    .toast{ font-size:12.5px; padding:11px 22px; bottom:20px; bottom:calc(20px + env(safe-area-inset-bottom)); }
+  }
+
+  /* ================= Responsive: Small Phone ================= */
+  @media (max-width: 400px){
+    .auth-visual{ padding:24px 18px 18px; padding-top:calc(24px + env(safe-area-inset-top)); }
+    .auth-form-side{ padding:24px 18px 32px; padding-bottom:calc(32px + env(safe-area-inset-bottom)); }
+    .auth-title{ font-size:22px; }
+    .auth-sub{ font-size:13px; }
+
+    header{ padding:9px 12px; padding-top:calc(9px + env(safe-area-inset-top)); }
+    .logo{ width:34px; height:34px; flex:0 0 34px; font-size:15px; }
+    .brand-text .title{ font-size:14.5px; }
+    .segmented button{ padding:7px 14px; font-size:12px; }
+    .btn.icon{ width:36px; height:36px; }
+    .user-avatar{ width:30px; height:30px; flex:0 0 30px; }
+
+    main{ padding:14px 10px 10px; }
+    .paper{ padding:24px 16px 44px; border-radius:18px; }
+    #editor{ font-size:16.5px; }
+    #preview{ font-size:16px; }
+  }
+
+  /* ================= Landscape Phone ================= */
+  @media (max-width: 960px) and (orientation: landscape) and (max-height: 500px){
+    .auth-visual{ min-height:auto; padding:20px 24px; }
+    .auth-brand .mark{ width:38px; height:38px; }
+    .auth-brand .name{ font-size:16px; }
+    .auth-form-side{ padding:22px 24px; }
+    .auth-title{ font-size:20px; }
+    .auth-sub{ margin-bottom:16px; }
   }
 </style>
 </head>
@@ -563,40 +997,122 @@
 <!-- ========== شاشة تسجيل الدخول ========== -->
 <div id="auth-screen" class="hidden">
   <div class="auth-card">
-    <div class="auth-logo">ن</div>
-    <h1 class="auth-title">مرحبًا بك في نوّتي</h1>
-    <p class="auth-sub">سجّل دخولك للوصول إلى نوتاتك الخاصة</p>
 
-    <div class="auth-msg" id="authMsg"></div>
+    <!-- جهة الرسم التوضيحي — داكنة دائمًا -->
+    <div class="auth-visual">
+      <div class="auth-visual-inner">
+        <div class="auth-brand">
+          <div class="mark">ن</div>
+          <div>
+            <div class="name">نوّتي</div>
+            <span class="tag">مساحة كتابتك الخاصة</span>
+          </div>
+        </div>
 
-    <div class="tabs">
-      <button type="button" data-auth-tab="login" class="active">تسجيل الدخول</button>
-      <button type="button" data-auth-tab="signup">إنشاء حساب</button>
+        <div class="auth-illustration">
+          <svg viewBox="0 0 320 320" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <!-- الورقة الخلفية -->
+            <path d="M58 68 L188 68 L188 128 L248 128 L248 268 Q248 288 228 288 L78 288 Q58 288 58 268 Z"
+                  stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" fill="none" opacity=".28"/>
+            <!-- الورقة الأمامية -->
+            <path d="M78 48 L208 48 L268 108 L268 248 Q268 268 248 268 L98 268 Q78 268 78 248 Z"
+                  stroke="currentColor" stroke-width="2.4" stroke-linejoin="round" fill="none" opacity=".95"/>
+            <!-- الطية -->
+            <path d="M208 48 L208 108 L268 108"
+                  stroke="currentColor" stroke-width="2.4" stroke-linejoin="round" fill="none" opacity=".95"/>
+            <!-- سطور النص -->
+            <line x1="108" y1="140" x2="238" y2="140" stroke="currentColor" stroke-width="2" stroke-linecap="round" opacity=".55"/>
+            <line x1="108" y1="172" x2="238" y2="172" stroke="currentColor" stroke-width="2" stroke-linecap="round" opacity=".55"/>
+            <line x1="108" y1="204" x2="195" y2="204" stroke="currentColor" stroke-width="2" stroke-linecap="round" opacity=".55"/>
+            <line x1="108" y1="234" x2="215" y2="234" stroke="currentColor" stroke-width="2" stroke-linecap="round" opacity=".35"/>
+            <!-- القلم -->
+            <g transform="translate(258 200) rotate(-45)">
+              <rect x="0" y="0" width="10" height="40" rx="2" stroke="currentColor" stroke-width="2" fill="none" opacity=".9"/>
+              <path d="M0 40 L5 52 L10 40 Z" stroke="currentColor" stroke-width="2" fill="none" opacity=".9"/>
+              <line x1="0" y1="10" x2="10" y2="10" stroke="currentColor" stroke-width="1.6" opacity=".7"/>
+            </g>
+            <!-- نقاط ديكورية -->
+            <circle cx="42" cy="120" r="3" fill="currentColor" opacity=".4"/>
+            <circle cx="32" cy="180" r="2" fill="currentColor" opacity=".4"/>
+            <circle cx="290" cy="70" r="3" fill="currentColor" opacity=".4"/>
+            <circle cx="300" cy="110" r="2" fill="currentColor" opacity=".4"/>
+            <circle cx="40" cy="240" r="2.5" fill="currentColor" opacity=".4"/>
+            <circle cx="295" cy="255" r="2.5" fill="currentColor" opacity=".4"/>
+            <!-- نجمة صغيرة -->
+            <path d="M60 90 L63 96 L69 99 L63 102 L60 108 L57 102 L51 99 L57 96 Z" fill="currentColor" opacity=".35"/>
+            <path d="M270 40 L272 44 L276 46 L272 48 L270 52 L268 48 L264 46 L268 44 Z" fill="currentColor" opacity=".35"/>
+          </svg>
+        </div>
+
+        <div class="auth-features">
+          <div class="auth-feature">
+            <span class="check">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M5 12l5 5L20 7"/>
+              </svg>
+            </span>
+            <span>احفظ نوتاتك تلقائيًا في حسابك الخاص</span>
+          </div>
+          <div class="auth-feature">
+            <span class="check">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M5 12l5 5L20 7"/>
+              </svg>
+            </span>
+            <span>تنسيق Markdown تلقائي من اليمين لليسار</span>
+          </div>
+          <div class="auth-feature">
+            <span class="check">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M5 12l5 5L20 7"/>
+              </svg>
+            </span>
+            <span>خصوصية كاملة — نوتاتك لا يراها أحد غيرك</span>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <form id="authForm" autocomplete="on">
-      <div class="field">
-        <label for="authEmail">البريد الإلكتروني</label>
-        <input type="email" id="authEmail" required placeholder="you@example.com" autocomplete="email">
-      </div>
-      <div class="field">
-        <label for="authPassword">كلمة المرور</label>
-        <input type="password" id="authPassword" required minlength="6" placeholder="••••••••" autocomplete="current-password">
-      </div>
-      <button type="submit" class="auth-submit" id="authSubmitBtn">تسجيل الدخول</button>
-    </form>
+    <!-- جهة النموذج -->
+    <div class="auth-form-side">
+      <div class="welcome">مرحبًا بك</div>
+      <h1 class="auth-title">سجّل دخولك للمتابعة</h1>
+      <p class="auth-sub">اختر الطريقة المناسبة لك للوصول إلى مساحتك الخاصة.</p>
 
-    <div class="divider">أو</div>
+      <div class="auth-msg" id="authMsg"></div>
 
-    <button type="button" class="btn-google" id="btnGoogle">
-      <svg viewBox="0 0 48 48">
-        <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
-        <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
-        <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
-        <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
-      </svg>
-      المتابعة بحساب Google
-    </button>
+      <div class="tabs">
+        <button type="button" data-auth-tab="login" class="active">تسجيل الدخول</button>
+        <button type="button" data-auth-tab="signup">إنشاء حساب</button>
+      </div>
+
+      <form id="authForm" autocomplete="on">
+        <div class="field">
+          <label for="authEmail">البريد الإلكتروني</label>
+          <input type="email" id="authEmail" required placeholder="you@example.com" autocomplete="email" inputmode="email">
+        </div>
+        <div class="field">
+          <label for="authPassword">كلمة المرور</label>
+          <input type="password" id="authPassword" required minlength="6" placeholder="••••••••" autocomplete="current-password">
+        </div>
+        <button type="submit" class="auth-submit" id="authSubmitBtn">تسجيل الدخول</button>
+      </form>
+
+      <div class="divider">أو</div>
+
+      <button type="button" class="btn-google" id="btnGoogle">
+        <svg viewBox="0 0 48 48">
+          <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+          <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+          <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+          <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+        </svg>
+        المتابعة بحساب Google
+      </button>
+
+      <p class="auth-footer-note">بالمتابعة، أنت توافق على شروط الاستخدام وسياسة الخصوصية.</p>
+    </div>
+
   </div>
 </div>
 
@@ -611,8 +1127,19 @@
   </div>
 
   <div class="segmented" id="segmented">
-    <button type="button" data-mode="write" class="active">كتابة</button>
-    <button type="button" data-mode="read">قراءة</button>
+    <button type="button" data-mode="write" class="active">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/>
+      </svg>
+      كتابة
+    </button>
+    <button type="button" data-mode="read">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
+        <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+      </svg>
+      قراءة
+    </button>
   </div>
 
   <div class="actions">
@@ -622,20 +1149,20 @@
     </div>
 
     <button class="btn icon" id="btnCopy" type="button" title="نسخ النص">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <rect x="9" y="9" width="12" height="12" rx="2.5"/>
         <path d="M6 15H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v1"/>
       </svg>
     </button>
 
     <button class="btn icon" id="btnDownload" type="button" title="تنزيل كملف Markdown">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M12 3v12"/><path d="m7.5 10.5 4.5 4.5 4.5-4.5"/><path d="M4 19h16"/>
       </svg>
     </button>
 
     <button class="btn icon" id="btnClear" type="button" title="مسح الكل">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M4 6h16"/><path d="M9 6V4.5A1.5 1.5 0 0 1 10.5 3h3A1.5 1.5 0 0 1 15 4.5V6"/>
         <path d="M6.5 6l.8 13.2A1.8 1.8 0 0 0 9.1 21h5.8a1.8 1.8 0 0 0 1.8-1.8L17.5 6"/>
         <path d="M10 10.5v6M14 10.5v6"/>
@@ -643,17 +1170,17 @@
     </button>
 
     <button class="btn icon" id="btnTheme" type="button" title="تبديل المظهر">
-      <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+      <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
       </svg>
-      <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+      <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <circle cx="12" cy="12" r="4"/>
         <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>
       </svg>
     </button>
 
     <button class="btn icon" id="btnLogout" type="button" title="تسجيل الخروج">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
         <path d="m10 17 5-5-5-5"/>
         <path d="M15 12H3"/>
@@ -808,7 +1335,17 @@
   let saveTimer = null;
   let isLoadingNote = false;
 
-  const EMPTY_HTML = '<p class="empty">لا يوجد شيء بعد… ابدأ بالكتابة أو الصق نصًا من الذكاء الاصطناعي، ثم اضغط «قراءة» لتراه منسّقًا.</p>';
+  const EMPTY_HTML = `
+    <div class="empty">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/>
+        <path d="M14 3v6h6"/>
+        <path d="M9 14h6M9 17h4"/>
+      </svg>
+      <h3 class="empty-title">مساحتك فاضية وجاهزة</h3>
+      <p class="empty-text">ابدأ بالكتابة مباشرة أو الصق نصًا من أي مساعد ذكي، وسيتم تنسيقه تلقائيًا من اليمين لليسار.</p>
+    </div>
+  `;
 
   /* =========================================================
      أدوات مساعدة
@@ -850,7 +1387,7 @@
   }
 
   /* =========================================================
-     Firestore: حفظ واسترجاع النوتات لكل مستخدم
+     Firestore
      ========================================================= */
   async function saveNoteToFirestore(uid, content){
     if(!uid) return;
@@ -930,6 +1467,7 @@
   });
 
   window.addEventListener('resize', autosize);
+  window.addEventListener('orientationchange', ()=> setTimeout(autosize, 200));
 
   /* =========================================================
      أدوات: نسخ / تنزيل / مسح
@@ -1058,13 +1596,11 @@
     if(user){
       currentUser = user;
 
-      // إظهار التطبيق وإخفاء شاشة الدخول
       authScreen.classList.add('hidden');
       appHeader.style.display = '';
       appMain.style.display = '';
       appFooter.style.display = '';
 
-      // تحديث معلومات المستخدم
       const nameEl = document.getElementById('userName');
       const avEl   = document.getElementById('userAvatar');
       const chip   = document.getElementById('userChip');
@@ -1077,7 +1613,6 @@
         avEl.textContent = displayName.charAt(0).toUpperCase();
       }
 
-      // تحميل النوت الخاصة بهذا المستخدم
       isLoadingNote = true;
       editor.value = '';
       updateUI();
@@ -1089,7 +1624,6 @@
     }else{
       currentUser = null;
 
-      // إخفاء التطبيق وإظهار شاشة الدخول
       appHeader.style.display = 'none';
       appMain.style.display = 'none';
       appFooter.style.display = 'none';
